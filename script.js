@@ -69,7 +69,55 @@ const products = [
         price: "$80",
         status: "Sold Out",
         image: "./assets/images/20221018_MonogramCC_Case_06_1080x720_crop_center.jpg.webp"
-    }
+    },
+    {
+        name: "Console Pack: Video",
+        price: "$89",
+        status: "Available",
+        image: "./assets/images/SW-box-render-mini-video-final-august_1080x778_crop_center.jpg.webp"
+    },
+    {
+        name: "Slider Module",
+        price: "$67",
+        status: "Available",
+        image: "./assets/images/Consoles_SliderBracket1_Monogram_May2020_4565_f941e8d9-d194-47ee-a54a-79132f105e34_750x500_crop_center.jpg.webp"
+
+    },
+     {
+        name: "Console Pack: Photo",
+        price: "$78",
+        status: "Available",
+        image: "./assets/images/SW-box-render-mini-photo-final-august_1080x778_crop_center.jpg.webp"
+
+    },
+     {
+        name: "Console Pack: Audio",
+        price: "$56",
+        status: "Available",
+        image: "./assets/images/SW-box-render-mini-midi-final-august_1080x778_crop_center.jpg.webp"
+
+    },
+     {
+        name: "Monogram Care",
+        price: "$129",
+        status: "Available",
+        image: "./assets/images/MONO_CONSOLE_CARE_STU_453eaa1a-02d9-4ba7-9d9a-8d05e2915f8f_1080x714_crop_center.jpg.webp"
+
+    },
+     {
+        name: "Dial Module",
+        price: "$39",
+        status: "Sold Out",
+        image: "./assets/images/Packaging_DialHeroBracket1_Monogram_May20204539_375e79fb-32f0-447b-b606-3dd0ac8318f6_1080x720_crop_center.jpg.webp"
+
+    },
+     {
+        name: "Essential Keys Module",
+        price: "$78",
+        status: "Available",
+        image: "./assets/images/Consoles_KeysBracket1_Monogram_May2020_4571_43b65ca9-4fde-4f55-9f0e-32374554ce76_1920x1280_crop_center.jpg.webp"
+
+    },
 ]
 
 
@@ -130,6 +178,7 @@ setupPagination(products);
 
 
 
+
 document.getElementById("searchInput").addEventListener("input", () => {
     const searchValue = document.getElementById("searchInput").value.toLowerCase();
 
@@ -139,4 +188,26 @@ document.getElementById("searchInput").addEventListener("input", () => {
     currentPage = 1;
     displayProducts(searchedProducts, currentPage);
     setupPagination(searchedProducts);
-})
+});
+
+
+document.getElementById("statusFilter").addEventListener("change", () => {
+    const selectedStatus = document.getElementById("statusFilter").value;
+    const searchValue = document.getElementById("searchInput").value.toLowerCase();
+
+    let filteredProducts = products;
+
+    filteredProducts = filteredProducts.filter(product => 
+        product.status.toLowerCase().includes(searchValue)
+    );
+
+    if(selectedStatus !== "all") {
+        filteredProducts = filteredProducts.filter(product =>
+            product.status.toLowerCase() === selectedStatus.toLowerCase()
+
+        );
+    }
+    currentPage = 1;
+    displayProducts(filteredProducts, currentPage);
+    setupPagination(filteredProducts);
+});
