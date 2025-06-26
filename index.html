@@ -9,14 +9,14 @@
 </head>
 <body>
      <h2>Product List</h2>
-     <input type="text" id="searchInput" placeholder="Search products"/>
+     <input type="text" onclick="mySearch()"   id="searchInput" placeholder="Search products"/>
 
-     <select id = "statusFilter">
+     <select id = "statusFilter" onchange="myFilter()">
         <option value="all">All</option>
         <option value="Available">Available</option>
         <option value="Sold Out">Sold Out</option>
      </select>
-     
+
      <table id="productTable" width = "100%" border = "2">
         <thead>
          <tr>
@@ -33,6 +33,12 @@
         </tbody>
       </table> 
       <div id="pagination"></div>
+
+
+      <div id = "Division" style ="background-color: red; width: 100%;  height: 100px;" >
+        hvjhvhvjvjhvjh
+      </div>
+      <button  id="btn">submit</button>
 
      <script src="script.js"></script>
 </body>

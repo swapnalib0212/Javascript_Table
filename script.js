@@ -117,10 +117,10 @@ const products = [
         status: "Available",
         image: "./assets/images/Consoles_KeysBracket1_Monogram_May2020_4571_43b65ca9-4fde-4f55-9f0e-32374554ce76_1920x1280_crop_center.jpg.webp"
 
-    },
+    }
 ]
 
-
+//table
 function displayProducts (products, page) {
 const tableBody = document.querySelector("#productTable tbody")
 tableBody.innerHTML = "";
@@ -156,6 +156,8 @@ pageItems.forEach(product => {
 });
 }
 
+//pagination
+
 function setupPagination(products) {
  const paginationDiv = document.getElementById("pagination");
  paginationDiv.innerHTML = "";
@@ -165,10 +167,11 @@ function setupPagination(products) {
  for(let i = 1; i <= pageCount; i++) {
     const btn = document.createElement("button");
     btn.textContent = i;
-    btn.addEventListener("click", () => {
+    
+        btn.onclick = function myButton () {
         currentPage = i;
         displayProducts(products, currentPage);
-    });
+    };
     paginationDiv.appendChild(btn);
  }
 }
@@ -178,8 +181,9 @@ setupPagination(products);
 
 
 
+// search
 
-document.getElementById("searchInput").addEventListener("input", () => {
+    function mySearch() {
     const searchValue = document.getElementById("searchInput").value.toLowerCase();
 
     const searchedProducts = products.filter( product => 
@@ -188,9 +192,10 @@ document.getElementById("searchInput").addEventListener("input", () => {
     currentPage = 1;
     displayProducts(searchedProducts, currentPage);
     setupPagination(searchedProducts);
-});
+};
 
 
+//filter
 document.getElementById("statusFilter").addEventListener("change", () => {
     const selectedStatus = document.getElementById("statusFilter").value;
     const searchValue = document.getElementById("searchInput").value.toLowerCase();
@@ -210,4 +215,9 @@ document.getElementById("statusFilter").addEventListener("change", () => {
     currentPage = 1;
     displayProducts(filteredProducts, currentPage);
     setupPagination(filteredProducts);
+});
+
+
+document.getElementById("btn").addEventListener("dblclick", () => {
+    const changeBackground = document.getElementById("Division").style.backgroundColor = "yellow";
 });
