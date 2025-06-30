@@ -1,0 +1,43 @@
+
+body {
+    text-align: center;
+    background-color: aliceblue;
+}
+
+h2 {
+    font-family: sans-serif;
+    text-decoration:underline;
+}
+#productTable {
+    background-color: lab(97.33% 2 0.7);
+}
+#pagination {
+    margin-top: 20px;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+#pagination button {
+    background-color: #eee;
+    border: 1px solid #ccc;
+    color: #333;
+    padding: 8px 12px;
+    margin: 0 4px;
+    cursor: pointer;
+    font-size: 14px;
+    
+}
+
+#pagination button:hover {
+    background-color: #d4cece;
+}
+
+#pagination button:active {
+    background-color: rgb(171, 232, 171);
+    
+}
+
+#searchInput {
+    width: 30%;
+    margin-bottom: 5px;
+}
