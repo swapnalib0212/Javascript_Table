@@ -1,5 +1,3 @@
-const itemsPerPage = 5;
-let currentPage = 1;
 
 
 const products = [
@@ -188,16 +186,21 @@ const products = [
     }
 ]
 
-//table
-function displayProducts (products, page) {
-    const tableBody = document.querySelector("#productTable tbody")
-    tableBody.innerHTML = "";
+window.onload = function() {
+let currentPage = 1;
+let itemsPerPage = parseInt(document.getElementById("itemsPerPageSelect").value);
 
-    const startIndex = page > 1 ? (page - 1) * itemsPerPage : 0;
-    const endIndex = startIndex + itemsPerPage;
-    const pageItems = products.slice(startIndex, endIndex);
-     
-    pageItems.forEach(function (product) {
+
+//table
+function displayProducts (products, page, itemsPerPage) {
+const Tablebody = document.querySelector("#productTable tbody");
+Tablebody.innerHTML = "";
+
+const startIndex = (page - 1) * itemsPerPage;
+const endIndex = startIndex + itemsPerPage;
+const pageItems = products.slice(startIndex, endIndex);
+
+pageItems.forEach(product => {
     const row = document.createElement("tr");
 
     const imgCell = document.createElement("td");
@@ -209,113 +212,80 @@ function displayProducts (products, page) {
     const nameCell = document.createElement("td");
     nameCell.textContent = product.name;
 
-    const descriptionCell = document.createElement("td");
-    descriptionCell.textContent = product.description;
-
     const priceCell = document.createElement("td");
     priceCell.textContent = product.price;
-
+    
     const statusCell = document.createElement("td");
     statusCell.textContent = product.status;
 
-    const ratingCell = document.createElement("td");
-    ratingCell.textContent = "⭐".repeat(product.rating);
+    const descriptionCell = document.createElement("td");
+    descriptionCell.textContent = product.description;
 
     row.appendChild(imgCell);
     row.appendChild(nameCell);
     row.appendChild(descriptionCell);
-    row.appendChild(priceCell);
     row.appendChild(statusCell);
-    row.appendChild(ratingCell);
-    tableBody.appendChild(row);
-    });
-};
+    row.appendChild(priceCell);
+
+    Tablebody.appendChild(row);
+    
+    
+    
+});
+
+}
 
 
 
-//pagination
 
-function setupPagination(products) {
-    const paginationDiv = document.getElementById("pagination");
-    paginationDiv.innerHTML = "";
+///pagination
+function setupPagination(products, itemsPerPage) {
+    const paginationblock = document.getElementById("pagination");
+    paginationblock.innerHTML = "";
 
     const pageCount = Math.ceil(products.length / itemsPerPage);
 
     for(let i = 1; i <= pageCount; i++) {
-    const btn = document.createElement("button");
-    btn.textContent = i;
-
-     btn.onclick = function myButton () {
-        currentPage = i;
-        displayProducts(products, currentPage);
-     };
-     paginationDiv.appendChild(btn);
-
-    };
-};
-displayProducts(products, currentPage);
-setupPagination(products);
-
-
-
-
-// search
-
-function mySearch () {
-    const searchValue = document.getElementById("searchInput").value.toLowerCase();
-    const searchedProducts = products.filter(product => 
-        product.name.toLowerCase().includes(searchValue)
-    );
-    currentPage = 1;
-    displayProducts(searchedProducts, currentPage);
-    setupPagination(searchedProducts);
-};
-
-
-//filter
-   function myFilter() {
-    const selectedStatus = document.getElementById("statusFilter").value;
-    const searchValue = document.getElementById("searchInput").value.toLowerCase();
-
-    let filteredProducts = products;
-
-    filteredProducts = filteredProducts.filter(product =>
-        product.status.toLowerCase().includes(searchValue)
-    );
-    if(selectedStatus !== "all") {
-        filteredProducts = filteredProducts.filter(product =>
-            product.status.toLowerCase() === selectedStatus.toLowerCase()
-        );
-    }
-    currentPage = 1;
-    displayProducts(filteredProducts, currentPage);
-    setupPagination(filteredProducts);
-
-   }
-
-   //filter
-   function PFilter() { 
-    const selectedPrice = document.getElementById("rateFilter").value;
-
-    let sortedProducts = products;
-
-    if(selectedPrice === "Price:Low to High") {
-        sortedProducts.sort((a, b) => parseFloat(a.price.replace("$", "")) - parseFloat(b.price.replace("$", "")));
-    } else if (selectedPrice === "Price:High to Low") {
-        sortedProducts.sort((a, b) => parseFloat(b.price.replace("$","")) - parseFloat(a.price.replace("$","")));
-    } else if (selectedPrice === "Newest Arrival") {
-        sortedProducts.sort((a, b) => new Date(b.dateAdded) - new Date(a.dateAdded))
-    } else if (selectedPrice === "Best Seller") {
-        sortedProducts = sortedProducts.filter(product => product.bestSeller);
-    }
+        const btn = document.createElement("button");
+       btn.textContent = i;
        
+       btn.onclick = function () {
+        currentPage = i;
+        displayProducts(products, currentPage, itemsPerPage);
+       }
+       paginationblock.appendChild(btn);
+    }
+    
+    
+}
+
+
+
+document.getElementById("itemsPerPageSelect").addEventListener("change", () => {
+     itemsPerPage = parseInt(document.getElementById("itemsPerPageSelect").value);
     currentPage = 1;
-    displayProducts(sortedProducts, currentPage);
-    setupPagination(sortedProducts);
-   }
+    
+})
 
 
+//search
+const searchInput = document.getElementById("searchInput");
+searchInput.addEventListener("keydown", (event) => {
+    if(event.key === "Enter") {
+        const value = searchInput.value.toLowerCase();
+        const searchedProducts = products.filter(product => 
+        product.name.toLowerCase().includes(value) || product.description.toLowerCase().includes(value)
+        );
+        currentPage = 1;
+        displayProducts(searchedProducts, currentPage, itemsPerPage);
+        setupPagination(searchedProducts, itemsPerPage);
+      
 
-document.getElementById("btn").addEventListener("dblclick", () => {
-    const changeBackground = document.getElementById("Division").style.backgroundColor = "yellow";
+        
+    };
 });
+
+displayProducts(products, currentPage, itemsPerPage);
+setupPagination(products, itemsPerPage);
+
+};

@@ -10,7 +10,23 @@
 </head>
 <body>
      <h2>Product List</h2>
-     <input type="text" onclick="mySearch()"   id="searchInput" placeholder="Search products"/>
+     <input type="text"   id="searchInput" placeholder="Search products"/>
+
+     
+     <label for="itemsPerPageSelect">ItemsPerPage</label>
+     <select id="itemsPerPageSelect">
+     <option value="3">3</option>
+     <option value="5">5</option>
+     <option value="10">10</option>
+     <option value="15">15</option>
+     </select>
+
+
+    
+
+
+
+
 
      <select id = "statusFilter"  onchange="myFilter()">
         <option value="all">Status: All</option>
@@ -44,8 +60,7 @@
         </tbody>
       </table> 
       <div id="pagination">
-        <ul  class="pagination">
-            
+        <ul class="pagination">
             
         </ul>
       </div>
