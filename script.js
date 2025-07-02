@@ -186,7 +186,7 @@ const products = [
     }
 ]
 
-window.onload = function() {
+
 let currentPage = 1;
 let itemsPerPage = parseInt(document.getElementById("itemsPerPageSelect").value);
 
@@ -221,11 +221,15 @@ pageItems.forEach(product => {
     const descriptionCell = document.createElement("td");
     descriptionCell.textContent = product.description;
 
+    const ratingCell = document.createElement("td");
+    ratingCell.textContent = "⭐".repeat(product.rating);
+
     row.appendChild(imgCell);
     row.appendChild(nameCell);
     row.appendChild(descriptionCell);
-    row.appendChild(statusCell);
     row.appendChild(priceCell);
+    row.appendChild(statusCell);
+    row.appendChild(ratingCell);
 
     Tablebody.appendChild(row);
     
@@ -260,32 +264,74 @@ function setupPagination(products, itemsPerPage) {
 }
 
 
-
-document.getElementById("itemsPerPageSelect").addEventListener("change", () => {
-     itemsPerPage = parseInt(document.getElementById("itemsPerPageSelect").value);
+document.getElementById("itemsPerPageSelect").addEventListener("change", () => {debugger
+     itemsPerPage = document.getElementById("itemsPerPageSelect").value;
     currentPage = 1;
     
-})
+    displayProducts(products, currentPage, itemsPerPage);
+    setupPagination(products, itemsPerPage);
+});
 
 
 //search
 const searchInput = document.getElementById("searchInput");
 searchInput.addEventListener("keydown", (event) => {
     if(event.key === "Enter") {
-        const value = searchInput.value.toLowerCase();
+        const searchedValue = searchInput.value.toLowerCase();
         const searchedProducts = products.filter(product => 
-        product.name.toLowerCase().includes(value) || product.description.toLowerCase().includes(value)
+        product.name.toLowerCase().includes(searchedValue) || product.description.toLowerCase().includes(searchedValue)
         );
         currentPage = 1;
         displayProducts(searchedProducts, currentPage, itemsPerPage);
         setupPagination(searchedProducts, itemsPerPage);
       
-
-        
     };
 });
 
 displayProducts(products, currentPage, itemsPerPage);
 setupPagination(products, itemsPerPage);
 
-};
+
+//filter
+
+function myFilter() {
+    const selectedStatus = document.getElementById("statusFilter").value;
+    const searchValue = document.getElementById("searchInput").value.toLowerCase();
+
+    let filteredProducts = products;
+
+    filteredProducts = filteredProducts.filter(product =>
+        product.status.toLowerCase().includes(searchValue)
+    );
+    if(selectedStatus !== "all") {
+        filteredProducts = filteredProducts.filter(product =>
+            product.status.toLowerCase() === selectedStatus.toLowerCase()
+        );
+        currentPage = 1;
+        displayProducts(filteredProducts, currentPage, itemsPerPage);
+        setupPagination(filteredProducts, itemsPerPage);
+    }
+}
+
+document.getElementById("rateFilter").addEventListener("change" , () => {
+  const selectedPrice = document.getElementById("rateFilter").value;
+  const searchedValue = document.getElementById("searchInput").value.toLowerCase();
+
+  let sortedProducts = products;
+
+  sortedProducts = sortedProducts.filter(product => 
+    product.price.toLowerCase().includes(searchedValue)
+)
+if(selectedPrice === "Price: Low to High") {
+    sortedProducts.sort((a, b) => parseFloat(a.price.replace("$", "")) - parseFloat(b.price.replace("$", "")))
+} else if (selectedPrice === "Price: High to Low") {
+    sortedProducts.sort((a, b) => parseFloat(b.price.replace("$"),"") - parseFloat(a.price.replace("$", "")))
+} else if (selectedPrice === "Newest Arrival") {
+    sortedProducts.sort((a, b) => new Date(b.dateAdded) - new Date(a.dateAdded))
+} else if (selectedPrice === "Best Seller") {
+    sortedProducts = sortedProducts.filter(product => product.bestSeller);
+}
+currentPage = 1;
+displayProducts(sortedProducts, currentPage, itemsPerPage);
+setupPagination(sortedProducts, itemsPerPage);
+});
