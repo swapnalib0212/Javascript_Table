@@ -184,12 +184,39 @@ const products = [
         dateAdded: "2024-12-01"
 
     }
+
 ]
+
+const TableData = {
+    TableTitle: "Product List",
+    SearchPlaceholder: "Search Products",
+    ItemsPerPage: 5,
+    Headers: ["Image", "Product Name","Description", "Price", "Status", "Rating" ],
+    ProductValue: products,
+    SearchByText: ["name", "description"],
+    Selection: {
+        "status": ["Available", "Sold Out", "All"]
+    }
+    
+}
 
 
 let currentPage = 1;
 let itemsPerPage = parseInt(document.getElementById("itemsPerPageSelect").value);
 
+///Title//
+    const TitleHeading = document.querySelector("#heading");
+    TitleHeading.textContent = TableData.TableTitle;
+
+
+    //search
+    const SearchIcon = document.createElement("input");
+    SearchIcon.type = "text";
+    SearchIcon.id = "searchInput";
+    SearchIcon.placeholder = "Search Products";
+    SearchIcon.list = "searchSuggestions"
+    document.body.appendChild(SearchIcon);
+   
 
 //table
 function displayProducts (products, page, itemsPerPage) {
@@ -233,10 +260,42 @@ pageItems.forEach(product => {
 
     Tablebody.appendChild(row);
     
-    
-    
 });
 
+//tableheader
+const Tablehead = document.querySelector("#productTable thead");
+Tablehead.innerHTML = "";
+
+const rowH = document.createElement("tr");
+
+const imageHeader = document.createElement("th");
+imageHeader.textContent = TableData.Headers[0];
+
+const nameHeader = document.createElement("th");
+nameHeader.textContent = TableData.Headers[1];
+
+const descriptionHeader = document.createElement("th");
+descriptionHeader.textContent = TableData.Headers[2];
+
+const priceHeader = document.createElement("th");
+priceHeader.textContent = TableData.Headers[3];
+
+const statusHeader = document.createElement("th");
+statusHeader.textContent = TableData.Headers[4];
+
+const ratingHeader = document.createElement("th");
+ratingHeader.textContent = TableData.Headers[5];
+
+
+
+rowH.appendChild(imageHeader);
+rowH.appendChild(nameHeader);
+rowH.appendChild(descriptionHeader);
+rowH.appendChild(priceHeader);
+rowH.appendChild(statusHeader);
+rowH.appendChild(ratingHeader);
+
+Tablehead.appendChild(rowH);
 }
 
 
@@ -263,8 +322,36 @@ function setupPagination(products, itemsPerPage) {
     
 }
 
+///itemsdropdown
+const perPageOption = [3, 5, 10, 15];
+const itemsPerPageSelect = document.getElementById("itemsPerPageSelect");
+perPageOption.forEach(num => {
+    const option = document.createElement("option");
+    option.value = num;
+    option.textContent = num;
+    itemsPerPageSelect.appendChild(option);
+    
+})
 
-document.getElementById("itemsPerPageSelect").addEventListener("change", () => {debugger
+
+////status
+const pageStatus  = [
+    {value: "all", text: "Status: All"},
+    {value: "Available", text: "Available"},
+    {value: "Sold Out", text: "Sold Out"}
+];
+const StatusSelect = document.getElementById("statusFilter");
+pageStatus.forEach(item => {
+    const optionB = document.createElement("option");
+    optionB.value = item.value;
+    optionB.textContent = item.text;
+    StatusSelect.appendChild(optionB);
+})
+
+
+
+//itemsperpageselect
+document.getElementById("itemsPerPageSelect").addEventListener("change", () => {
      itemsPerPage = document.getElementById("itemsPerPageSelect").value;
     currentPage = 1;
     
@@ -272,6 +359,7 @@ document.getElementById("itemsPerPageSelect").addEventListener("change", () => {
     setupPagination(products, itemsPerPage);
 });
 
+//////
 
 //search
 const searchInput = document.getElementById("searchInput");
@@ -290,6 +378,69 @@ searchInput.addEventListener("keydown", (event) => {
 
 displayProducts(products, currentPage, itemsPerPage);
 setupPagination(products, itemsPerPage);
+
+
+///////////////////////////////////////////////searchsuggestions
+
+const datalist = document.getElementById("searchSuggestions");
+searchInput.value = "";
+searchInput.addEventListener("input", () => {
+    let rawValue = searchInput.value.trim();
+
+    if(rawValue.toLowerCase().startsWith("search by name:")) {
+        rawValue = rawValue.slice("search by name:".length).trim();
+    }else if (rawValue.toLowerCase().startsWith("search by description:")) {
+        rawValue = rawValue.slice("search by description:".length).trim()
+    }
+    datalist.innerHTML = "";
+    if(rawValue === "")return;
+
+    const suggestions = [
+        `Search By Name: ${rawValue}`,
+        `Search By Description: ${rawValue}`
+    ];
+    suggestions.forEach(text =>{
+        const option = document.createElement("option");
+        option.value = text;
+        datalist.appendChild(option);
+    })
+
+})
+////enter key ///
+
+        function handleSearch () {
+        const inputValue = searchInput.value.trim();
+
+        let filterType = "name";
+        let keyword = inputValue;
+
+        if(inputValue.toLowerCase().startsWith("search by name:")) {
+            filterType = "name";
+            keyword = inputValue.slice("search by name:".length).trim();
+        } else if (inputValue.toLowerCase().startsWith("search by description:")) {
+            filterType = "description";
+            keyword = inputValue.slice("search by description:".length).trim();
+        }
+        const searchedProducts = products.filter(product => {
+        const field = product[filterType].toLowerCase();
+        return field.includes(keyword.toLowerCase());
+        });
+
+        currentPage = 1;
+        displayProducts(searchedProducts,currentPage, itemsPerPage);
+        setupPagination(searchedProducts, itemsPerPage)
+        
+    }
+        
+    searchInput.addEventListener("keydown",(event) => {
+    if(event.key === "Enter") handleSearch();
+    });
+   
+    searchInput.addEventListener("change", handleSearch);
+
+
+
+
 
 
 //filter
@@ -313,25 +464,38 @@ function myFilter() {
     }
 }
 
-document.getElementById("rateFilter").addEventListener("change" , () => {
-  const selectedPrice = document.getElementById("rateFilter").value;
-  const searchedValue = document.getElementById("searchInput").value.toLowerCase();
 
-  let sortedProducts = products;
+///ratefilter
 
-  sortedProducts = sortedProducts.filter(product => 
-    product.price.toLowerCase().includes(searchedValue)
-)
-if(selectedPrice === "Price: Low to High") {
-    sortedProducts.sort((a, b) => parseFloat(a.price.replace("$", "")) - parseFloat(b.price.replace("$", "")))
-} else if (selectedPrice === "Price: High to Low") {
-    sortedProducts.sort((a, b) => parseFloat(b.price.replace("$"),"") - parseFloat(a.price.replace("$", "")))
-} else if (selectedPrice === "Newest Arrival") {
-    sortedProducts.sort((a, b) => new Date(b.dateAdded) - new Date(a.dateAdded))
-} else if (selectedPrice === "Best Seller") {
-    sortedProducts = sortedProducts.filter(product => product.bestSeller);
-}
-currentPage = 1;
-displayProducts(sortedProducts, currentPage, itemsPerPage);
-setupPagination(sortedProducts, itemsPerPage);
-});
+document.getElementById("rateFilter").addEventListener("change", () => {
+    const Selectedrate = document.getElementById("rateFilter").value;
+    const searchedValue = document.getElementById("searchInput").value.toLowerCase();
+     
+    let sortproducts = products;
+    sortproducts = sortproducts.filter(product => product.price.includes(searchedValue))
+
+    if(Selectedrate === "Price: Low to High") {
+        sortproducts.sort((a, b) => parseFloat(a.price.replace("$", "")) - parseFloat(b.price.replace("$", "")))
+    } else if (Selectedrate === "Price: High to Low") {
+        sortproducts.sort((a, b) => parseFloat(b.price.replace("$", "")) - parseFloat(a.price.replace("$", "")))
+    } else if (Selectedrate === "Newest Arrival") {
+        sortproducts.sort((a, b) => new Date(b.dateAdded) - new Date(a.dateAdded)) 
+    } else if (Selectedrate === "Best Seller") {
+       sortproducts = sortproducts.filter(product => product.bestSeller);
+    }
+
+    currentPage = 1;
+    displayProducts(sortproducts, currentPage, itemsPerPage);
+    setupPagination(sortproducts, itemsPerPage);
+})
+
+
+
+window.onload = function () {
+  itemsPerPage = parseInt(document.getElementById("itemsPerPageSelect").value);
+  displayProducts(products, currentPage, itemsPerPage);
+  setupPagination(products, itemsPerPage);
+};
+
+
+

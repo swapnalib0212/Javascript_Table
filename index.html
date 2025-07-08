@@ -9,33 +9,21 @@
     
 </head>
 <body>
-     <h2>Product List</h2>
-     <input type="text"   id="searchInput" placeholder="Search products"/>
+     <h1 id = "heading"></h1>
+
+     <input id = "searchInput" list="searchSuggestions" placeholder="Search here"/>
+     <datalist id="searchSuggestions"></datalist>
 
      
      <label for="itemsPerPageSelect">ItemsPerPage</label>
-     <select id="itemsPerPageSelect">
-     <option value="3">3</option>
-     <option value="5">5</option>
-     <option value="10">10</option>
-     <option value="15">15</option>
-     </select>
+     <select id="itemsPerPageSelect"></select>
 
 
-    
-
-
-
-
-
-     <select id = "statusFilter"  onchange="myFilter()">
-        <option value="all">Status:All</option>
-        <option value="Available">Available</option>
-        <option value="Sold Out">Sold Out</option>
-     </select>
+     <select id = "statusFilter"  onchange="myFilter()"></select>
+     
      
 
-     <select id ="rateFilter" onchange="PFilter()"> 
+     <select id ="rateFilter"> 
 
      <option value="Price:Low to High">Sort By :Price:Low to High</option>
      <option value="Price:High to Low">Sort By :Price:High to Low</option>
@@ -44,14 +32,7 @@
      </select>
      <table id="productTable" width = "100%" border = "2">
         <thead>
-         <tr>
-            <th>Image</th>
-            <th>Product Name</th>
-            <th>Description</th>
-            <th>Price</th>
-            <th>Status</th>
-            <th>Rating</th>
-         </tr>
+         
         </thead>
      
     
