@@ -191,14 +191,22 @@ const TableData = {
     TableTitle: "Product List",
     SearchPlaceholder: "Search Products",
     ItemsPerPage: 5,
-    Headers: ["Image", "Product Name","Description", "Price", "Status", "Rating" ],
+    Headers: [
+        {label: "Image", key: "image"},
+        {label: "Product Name", key: "name"},
+        {label: "Description", key: "description"},
+        {label: "Price", key: "price"},
+        {label: "Status", key:"status"},
+        {label: "Rating", key:"rating"}
+    ],
     ProductValue: products,
-    SearchByText: ["name", "description"],
+    SearchByText: ["name", "description", "price", "status"],
     Selection: {
-        "status": ["Available", "Sold Out", "All"]
+        "status": ["All", "Available", "Sold Out"]
     }
     
 }
+
 
 
 let currentPage = 1;
@@ -209,16 +217,31 @@ let itemsPerPage = parseInt(document.getElementById("itemsPerPageSelect").value)
     TitleHeading.textContent = TableData.TableTitle;
 
 
-    //search
-    const SearchIcon = document.createElement("input");
-    SearchIcon.type = "text";
-    SearchIcon.id = "searchInput";
-    SearchIcon.placeholder = "Search Products";
-    SearchIcon.list = "searchSuggestions"
-    document.body.appendChild(SearchIcon);
+    // //search
+    // const SearchIcon = document.createElement("input");
+    // SearchIcon.type = "text";
+    // SearchIcon.id = "searchInput";
+    // SearchIcon.placeholder = "Search Products";
+    // SearchIcon.list = "searchSuggestions"
+    // document.body.appendChild(SearchIcon);
    
 
-//table
+  
+  //tableheader
+const Tablehead = document.querySelector("#productTable thead");
+Tablehead.innerHTML = "";
+
+const rowH = document.createElement("tr");
+
+TableData.Headers.forEach(header => {
+    const th = document.createElement("th");
+    th.textContent = header.label;
+    rowH.appendChild(th);
+});
+Tablehead.appendChild(rowH);
+
+
+//tablebody
 function displayProducts (products, page, itemsPerPage) {
 const Tablebody = document.querySelector("#productTable tbody");
 Tablebody.innerHTML = "";
@@ -230,73 +253,28 @@ const pageItems = products.slice(startIndex, endIndex);
 pageItems.forEach(product => {
     const row = document.createElement("tr");
 
-    const imgCell = document.createElement("td");
-    const img = document.createElement("img");
-    img.src = product.image;
-    img.width = 100;
-    imgCell.appendChild(img);
+    TableData.Headers.forEach(header => {
+        const td = document.createElement("td");
+        const value = product[header.key];
 
-    const nameCell = document.createElement("td");
-    nameCell.textContent = product.name;
-
-    const priceCell = document.createElement("td");
-    priceCell.textContent = product.price;
+        if(header.key === "image") {
+            const img = document.createElement("img");
+            img.src = value;
+            img.width = 100;
+            td.appendChild(img);
+        } else if (header.key === "rating") {
+            td.textContent = "⭐".repeat(parseInt(value));
+        } else {
+            td.textContent = value;
+        }
+        row.appendChild(td);
+    });
     
-    const statusCell = document.createElement("td");
-    statusCell.textContent = product.status;
-
-    const descriptionCell = document.createElement("td");
-    descriptionCell.textContent = product.description;
-
-    const ratingCell = document.createElement("td");
-    ratingCell.textContent = "⭐".repeat(product.rating);
-
-    row.appendChild(imgCell);
-    row.appendChild(nameCell);
-    row.appendChild(descriptionCell);
-    row.appendChild(priceCell);
-    row.appendChild(statusCell);
-    row.appendChild(ratingCell);
-
     Tablebody.appendChild(row);
+    });
     
-});
-
-//tableheader
-const Tablehead = document.querySelector("#productTable thead");
-Tablehead.innerHTML = "";
-
-const rowH = document.createElement("tr");
-
-const imageHeader = document.createElement("th");
-imageHeader.textContent = TableData.Headers[0];
-
-const nameHeader = document.createElement("th");
-nameHeader.textContent = TableData.Headers[1];
-
-const descriptionHeader = document.createElement("th");
-descriptionHeader.textContent = TableData.Headers[2];
-
-const priceHeader = document.createElement("th");
-priceHeader.textContent = TableData.Headers[3];
-
-const statusHeader = document.createElement("th");
-statusHeader.textContent = TableData.Headers[4];
-
-const ratingHeader = document.createElement("th");
-ratingHeader.textContent = TableData.Headers[5];
-
-
-
-rowH.appendChild(imageHeader);
-rowH.appendChild(nameHeader);
-rowH.appendChild(descriptionHeader);
-rowH.appendChild(priceHeader);
-rowH.appendChild(statusHeader);
-rowH.appendChild(ratingHeader);
-
-Tablehead.appendChild(rowH);
-}
+};
+displayProducts(TableData.ProductValue, 1, TableData.ItemsPerPage);
 
 
 
@@ -334,20 +312,6 @@ perPageOption.forEach(num => {
 })
 
 
-////status
-const pageStatus  = [
-    {value: "all", text: "Status: All"},
-    {value: "Available", text: "Available"},
-    {value: "Sold Out", text: "Sold Out"}
-];
-const StatusSelect = document.getElementById("statusFilter");
-pageStatus.forEach(item => {
-    const optionB = document.createElement("option");
-    optionB.value = item.value;
-    optionB.textContent = item.text;
-    StatusSelect.appendChild(optionB);
-})
-
 
 
 //itemsperpageselect
@@ -360,6 +324,18 @@ document.getElementById("itemsPerPageSelect").addEventListener("change", () => {
 });
 
 //////
+
+
+////status
+
+const StatusSelect = document.getElementById("statusFilter");
+TableData.Selection.status.forEach(status => {
+    const optionB = document.createElement("option");
+    optionB.value = status.toLowerCase() === "all" ? "all" : status;
+    optionB.textContent = status === "All" ? "Status: All" : status;
+    StatusSelect.appendChild(optionB);
+})
+
 
 //search
 const searchInput = document.getElementById("searchInput");
@@ -404,65 +380,139 @@ searchInput.addEventListener("input", () => {
         option.value = text;
         datalist.appendChild(option);
     })
-
-})
-////enter key ///
-
-        function handleSearch () {
-        const inputValue = searchInput.value.trim();
-
-        let filterType = "name";
-        let keyword = inputValue;
-
-        if(inputValue.toLowerCase().startsWith("search by name:")) {
-            filterType = "name";
-            keyword = inputValue.slice("search by name:".length).trim();
-        } else if (inputValue.toLowerCase().startsWith("search by description:")) {
-            filterType = "description";
-            keyword = inputValue.slice("search by description:".length).trim();
-        }
-        const searchedProducts = products.filter(product => {
-        const field = product[filterType].toLowerCase();
-        return field.includes(keyword.toLowerCase());
-        });
-
-        currentPage = 1;
-        displayProducts(searchedProducts,currentPage, itemsPerPage);
-        setupPagination(searchedProducts, itemsPerPage)
-        
-    }
-        
-    searchInput.addEventListener("keydown",(event) => {
-    if(event.key === "Enter") handleSearch();
-    });
+    
    
-    searchInput.addEventListener("change", handleSearch);
-
-
-
-
-
-
-//filter
-
-function myFilter() {
-    const selectedStatus = document.getElementById("statusFilter").value;
-    const searchValue = document.getElementById("searchInput").value.toLowerCase();
-
-    let filteredProducts = products;
-
-    filteredProducts = filteredProducts.filter(product =>
-        product.status.toLowerCase().includes(searchValue)
-    );
-    if(selectedStatus !== "all") {
-        filteredProducts = filteredProducts.filter(product =>
-            product.status.toLowerCase() === selectedStatus.toLowerCase()
-        );
-        currentPage = 1;
-        displayProducts(filteredProducts, currentPage, itemsPerPage);
-        setupPagination(filteredProducts, itemsPerPage);
+});
+    searchInput.addEventListener("keydown",(event) => {
+    if(event.key === "Enter"){
+        applyFilters();
     }
+    });
+     searchInput.addEventListener("change", applyFilters);
+
+
+
+
+function applyFilters() {
+    const selectedStatus = document.getElementById("statusFilter").value;
+    const inputValue = document.getElementById("searchInput").value.trim().toLowerCase();
+
+    let keyword = inputValue;
+    let specificField = null;
+
+    if (inputValue.startsWith("search by name:")){
+        specificField ="name";
+        keyword = inputValue.slice("search by name:".length).trim();
+    } else if (inputValue.startsWith("search by description:")) {
+        specificField = "description";
+        keyword = inputValue.slice("search by description:".length).trim();
+    }
+
+    let filtered = [...products];
+
+    if(keyword !== "") {
+        filtered = filtered.filter(product => {
+            if (specificField) {
+                return product[specificField].toLowerCase().includes(keyword)
+            } else {
+                return TableData.SearchByText.some(field =>
+                    product[field]?.toLowerCase().includes(keyword)
+                );
+            }
+            
+        });
+    }
+    
+
+
+    activeFilters.forEach(filter => {
+    filtered = filtered.filter(product => {
+      if (filter.type === "general") {
+        return TableData.SearchByText.some(field =>
+          product[field].toLowerCase().includes(filter.keyword)
+        );
+      } else {
+        return product[filter.type]?.toLowerCase().includes(filter.keyword);
+      }
+    });
+     
+    });
+    if (selectedStatus !== "all") {
+        filtered = filtered.filter(product =>
+            product.status?.toLowerCase() === selectedStatus
+        );
+    }
+
+
+
+
+
+    currentPage = 1;
+    displayProducts(filtered, currentPage, TableData.ItemsPerPage);
+    setupPagination(filtered, TableData.ItemsPerPage);
 }
+
+searchInput.addEventListener("keydown", (event) => {
+    if(event.key === "Enter") {
+        addActiveFilters();
+    }
+});
+searchInput.addEventListener("change", addActiveFilters);
+
+//////////////////////////
+
+const activeFilters = [];
+
+function addActiveFilters () {
+    const inputValue = document.getElementById("searchInput").value.trim().toLowerCase();
+    if (inputValue === "")return;
+
+    let keyword = inputValue;
+    let specificField = null;
+
+    if(inputValue.startsWith("search by name:")) {
+        specificField = "name";
+        keyword = inputValue.slice("search by name:" .length).trim();
+    } else if (inputValue.startsWith("search by description:")) {
+        specificField = "description";
+        keyword = inputValue.slice("search by description:".length).trim();
+    } 
+    if (keyword === "") return;
+
+    activeFilters.push({
+        type: specificField || "general",
+        keyword: keyword
+    });
+
+    document.getElementById("searchInput").value = "";
+    renderActiveFilters();
+    applyFilters();
+}
+
+function renderActiveFilters() {
+    const container = document.getElementById("activeFiltersContainer");
+    container.innerHTML = "";
+
+    activeFilters.forEach((filter, index) => {
+        const div = document.createElement("div");
+        div.className = "filter-chip";
+        div.textContent = `${filter.type === "general" ? "Any Field" : filter.type}: ${filter.keyword}`;
+
+        const btn = document.createElement("button");
+        btn.textContent = "x";
+        btn.addEventListener("click", () => {
+            removeFilter(index);
+        });
+        div.appendChild(btn);
+        container.appendChild(div);
+    })
+}
+
+  function removeFilter(index) {
+    activeFilters.splice(index, 1);
+    renderActiveFilters();
+    applyFilters();
+  } 
 
 
 ///ratefilter
@@ -487,7 +537,7 @@ document.getElementById("rateFilter").addEventListener("change", () => {
     currentPage = 1;
     displayProducts(sortproducts, currentPage, itemsPerPage);
     setupPagination(sortproducts, itemsPerPage);
-})
+});
 
 
 
@@ -496,6 +546,3 @@ window.onload = function () {
   displayProducts(products, currentPage, itemsPerPage);
   setupPagination(products, itemsPerPage);
 };
-
-
-
