@@ -41,3 +41,43 @@ h2 {
     width: 30%;
     margin-bottom: 5px;
 }
+
+#statusFilter {
+
+    margin-bottom: 10px;
+}
+
+#activeFiltersContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 16px 0;
+}
+
+.filter-chip {
+  display: flex;
+  align-items: center;
+  background-color: rgb(234, 158, 171);
+  color: #0f1417;
+  padding: 6px 12px;
+  border-radius: 5px;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.filter-chip button {
+  margin-left: 8px;
+  background: none;
+  border: none;
+  color: #004a77;
+  font-size: 16px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.filter-chip button:hover {
+  color: #f6f2f2;
+}

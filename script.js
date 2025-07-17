@@ -216,16 +216,6 @@ let itemsPerPage = parseInt(document.getElementById("itemsPerPageSelect").value)
     const TitleHeading = document.querySelector("#heading");
     TitleHeading.textContent = TableData.TableTitle;
 
-
-    // //search
-    // const SearchIcon = document.createElement("input");
-    // SearchIcon.type = "text";
-    // SearchIcon.id = "searchInput";
-    // SearchIcon.placeholder = "Search Products";
-    // SearchIcon.list = "searchSuggestions"
-    // document.body.appendChild(SearchIcon);
-   
-
   
   //tableheader
 const Tablehead = document.querySelector("#productTable thead");
@@ -334,7 +324,7 @@ TableData.Selection.status.forEach(status => {
     optionB.value = status.toLowerCase() === "all" ? "all" : status;
     optionB.textContent = status === "All" ? "Status: All" : status;
     StatusSelect.appendChild(optionB);
-})
+});
 
 
 //search
@@ -408,48 +398,60 @@ function applyFilters() {
         keyword = inputValue.slice("search by description:".length).trim();
     }
 
-    let filtered = [...products];
+    
+    let resultSets = [];
 
     if(keyword !== "") {
-        filtered = filtered.filter(product => {
+           const inputMatches = products.filter(product => { 
             if (specificField) {
                 return product[specificField].toLowerCase().includes(keyword)
             } else {
                 return TableData.SearchByText.some(field =>
-                    product[field]?.toLowerCase().includes(keyword)
+                    product[field].toLowerCase().includes(keyword)
                 );
             }
             
         });
+        resultSets.push(inputMatches);
     }
     
 
 
     activeFilters.forEach(filter => {
-    filtered = filtered.filter(product => {
+    const filterMatches = products.filter(product => {
       if (filter.type === "general") {
         return TableData.SearchByText.some(field =>
           product[field].toLowerCase().includes(filter.keyword)
         );
       } else {
-        return product[filter.type]?.toLowerCase().includes(filter.keyword);
+        return product[filter.type].toLowerCase().includes(filter.keyword);
       }
     });
-     
+     resultSets.push(filterMatches);
     });
+    
+
+    let mergedResults;
+    if(resultSets.length === 0) {
+        mergedResults = [...products];
+    } else {
+        const map = new map();
+        resultSets.flat().forEach(product => {
+            map.set(product.name, product);
+        });
+        mergedResults = Array.from(map.values());
+    }
+
     if (selectedStatus !== "all") {
-        filtered = filtered.filter(product =>
-            product.status?.toLowerCase() === selectedStatus
+        mergedResults = mergedResults.filter(product =>
+            product.status.toLowerCase() === selectedStatus
         );
     }
 
 
-
-
-
     currentPage = 1;
-    displayProducts(filtered, currentPage, TableData.ItemsPerPage);
-    setupPagination(filtered, TableData.ItemsPerPage);
+    displayProducts(mergedResults, currentPage, TableData.ItemsPerPage);
+    setupPagination(mergedResults, TableData.ItemsPerPage);
 }
 
 searchInput.addEventListener("keydown", (event) => {
