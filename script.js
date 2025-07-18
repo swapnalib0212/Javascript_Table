@@ -352,12 +352,15 @@ const datalist = document.getElementById("searchSuggestions");
 searchInput.value = "";
 searchInput.addEventListener("input", () => {
     let rawValue = searchInput.value.trim();
+    let fieldmatched = null;
+    TableData.SearchByText.forEach(field => {
+        const prefix = `search by ${field.toLowerCase()}:`;
+        if(rawValue.startsWith(prefix)) {
+            rawValue = rawValue.slice(prefix.length).trim();
+            fieldmatched  = field;
+        }
+    })
 
-    if(rawValue.toLowerCase().startsWith("search by name:")) {
-        rawValue = rawValue.slice("search by name:".length).trim();
-    }else if (rawValue.toLowerCase().startsWith("search by description:")) {
-        rawValue = rawValue.slice("search by description:".length).trim()
-    }
     datalist.innerHTML = "";
     if(rawValue === "")return;
 
