@@ -381,7 +381,7 @@ searchInput.addEventListener("input", () => {
      searchInput.addEventListener("change", applyFilters);
 
 
-
+////////////////////////
 
 function applyFilters() {
     const selectedStatus = document.getElementById("statusFilter").value;
@@ -390,14 +390,14 @@ function applyFilters() {
     let keyword = inputValue;
     let specificField = null;
 
-    if (inputValue.startsWith("search by name:")){
-        specificField ="name";
-        keyword = inputValue.slice("search by name:".length).trim();
-    } else if (inputValue.startsWith("search by description:")) {
-        specificField = "description";
-        keyword = inputValue.slice("search by description:".length).trim();
-    }
 
+    for(const header of TableData.Headers) {
+        const prefix = `search by ${header.key.toLowerCase()}:`;
+        if(inputValue.startsWith(prefix)) {
+            specificField = header.key;
+            keyword = inputValue.slice(prefix.length).trim();
+        }
+    }
     
     let resultSets = [];
 
@@ -435,11 +435,11 @@ function applyFilters() {
     if(resultSets.length === 0) {
         mergedResults = [...products];
     } else {
-        const map = new map();
+        const productMap = new Map();
         resultSets.flat().forEach(product => {
-            map.set(product.name, product);
+            productMap.set(product.name, product);
         });
-        mergedResults = Array.from(map.values());
+        mergedResults = Array.from(productMap.values());
     }
 
     if (selectedStatus !== "all") {
@@ -471,14 +471,15 @@ function addActiveFilters () {
 
     let keyword = inputValue;
     let specificField = null;
-
-    if(inputValue.startsWith("search by name:")) {
-        specificField = "name";
-        keyword = inputValue.slice("search by name:" .length).trim();
-    } else if (inputValue.startsWith("search by description:")) {
-        specificField = "description";
-        keyword = inputValue.slice("search by description:".length).trim();
-    } 
+     
+    for(const header of TableData.Headers) {
+        const prefix = `search by ${header.key.toLowerCase()}:`; 
+        if(inputValue.startsWith(prefix)){
+            specificField = header.key;
+            keyword = inputValue.slice(prefix.length).trim();
+        }
+    }
+    
     if (keyword === "") return;
 
     activeFilters.push({
